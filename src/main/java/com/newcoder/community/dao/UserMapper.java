@@ -1,10 +1,7 @@
 package com.newcoder.community.dao;
 
 import com.newcoder.community.entity.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface UserMapper {
@@ -19,6 +16,7 @@ public interface UserMapper {
     User selectByEmail(String email);
 
     @Insert("insert into user(id, username, password, salt, email, type, status, activation_code, header_url, create_time) values(#{id}, #{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl},#{createTime})")
+    @Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
     int insertUser(User user); //默认返回的是插入的行数
 
     @Update("update user set password = #{password} where id = #{id}")
