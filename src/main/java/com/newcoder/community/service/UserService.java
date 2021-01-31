@@ -56,7 +56,7 @@ public class UserService implements CommunityConstant {
          * null是指对象为空，根本连内存都没分配
          * 空值是这个变量分配了内存，但是这块内存存储的值是空值
          */
-        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>();//用map保存状态信息：成功 ，失败的msg
         if(user == null){
             throw new IllegalArgumentException("参数不能为空");
         }
