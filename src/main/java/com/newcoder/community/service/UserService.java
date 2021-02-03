@@ -1,10 +1,13 @@
 package com.newcoder.community.service;
 
+import com.newcoder.community.dao.LoginTicketMapper;
 import com.newcoder.community.dao.UserMapper;
+import com.newcoder.community.entity.LoginTicket;
 import com.newcoder.community.entity.User;
 import com.newcoder.community.utils.CommunityConstant;
 import com.newcoder.community.utils.CommunityUtils;
 import com.newcoder.community.utils.MailClient;
+import javafx.beans.binding.ObjectExpression;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +25,9 @@ import java.util.Random;
 
 @Service
 public class UserService implements CommunityConstant {
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -132,6 +138,62 @@ public class UserService implements CommunityConstant {
         }
     }
 
+    /**
+     * 登陆
+     * @param username
+     * @param password
+     * @param expiredSeconds
+     * 正常情况下要处理 username，password，code 3个输入框的参数的，只是这里code 不需要在业务层处理，所以就没写
+     * 而这里传入 expiredSeconds 是因为登陆成功需要生成登陆凭证，而登录凭证实体的属性expired需要用expiredSeconds计算出
+     * expired是过期的时间，expiredSeconds是从登陆到过期之间的总秒数
+     */
+    public Map<String,Object> login(String username,String password,int expiredSeconds){
+        Map<String ,Object> map = new HashMap<>();
+        //账户名为空处理
+        if(StringUtils.isBlank(username)){
+            map.put("usernameMsg","账号不能为空");
+            return map;
+        }
+        //密码为空处理
+        if(StringUtils.isBlank(password)){
+            map.put("passwordMsg", "密码不能为空!");
+            return map;
+        }
+        //验证账号是否存在
+        User user = userMapper.selectByName(username);
+        if(user == null){
+            map.put("usernameMsg", "该账号不存在!");
+            return map;
+        }
+
+        //验证状态是否激活
+        if( user.getStatus() == 0){
+            map.put("usernameMsg", "该账号未激活!");
+            return map;
+        }
+
+        // 验证密码
+        password = CommunityUtils.md5(password + user.getSalt());
+        if (!user.getPassword().equals(password)) {
+            map.put("passwordMsg", "密码不正确!");
+            return map;
+        }
+
+        //生成登录凭证(登陆成功就得生成登录凭证，给你发一张“卡”)
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setTicket(CommunityUtils.generateUUID());
+        loginTicket.setStatus(0);//0-有效
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
+        loginTicketMapper.insertLoginTicket(loginTicket);
+
+        map.put("ticket", loginTicket.getTicket());
+        return map;
+    }
+
+    public void logout(String ticket){
+        loginTicketMapper.updateStatus(ticket,1);
+    }
 
 
 }

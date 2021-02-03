@@ -1,9 +1,12 @@
 package com.newcoder.community;
 
 import com.newcoder.community.dao.DiscussPostMapper;
+import com.newcoder.community.dao.LoginTicketMapper;
 import com.newcoder.community.dao.UserMapper;
 import com.newcoder.community.entity.DiscussPost;
+import com.newcoder.community.entity.LoginTicket;
 import com.newcoder.community.entity.User;
+import com.newcoder.community.utils.CommunityUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +17,9 @@ import java.util.List;
 
 @SpringBootTest
 public class MapperTest {
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -71,5 +77,37 @@ public class MapperTest {
         System.out.println("---------------------------------------------------------------------");
         int res = discussPostMapper.selectDiscussPostRows(138);
         System.out.println("res = \n" + res);
+    }
+
+
+    @Test
+    public void testInsertOfLoginTicketMapper(){
+
+        //测试insert
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(123);
+        loginTicket.setStatus(0);
+        loginTicket.setTicket("abc");
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+        loginTicketMapper.insertLoginTicket(loginTicket);
+
+    }
+
+    @Test
+    public void testSelectOfLoginTicketMapper(){
+        //测试select
+        String ticket = "abc";
+        LoginTicket lgticket = new LoginTicket();
+        lgticket = loginTicketMapper.selectByTicket(ticket);
+        System.out.println("lgticket = " + lgticket);
+    }
+
+    @Test
+    public void testUpdateOfLoginTicketMapper(){
+        //测试update
+        System.out.println(loginTicketMapper.selectByTicket("abc"));
+        loginTicketMapper.updateStatus("abc",1);
+        System.out.println(loginTicketMapper.selectByTicket("abc"));
+
     }
 }
