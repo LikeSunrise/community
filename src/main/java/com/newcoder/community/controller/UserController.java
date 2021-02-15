@@ -1,5 +1,6 @@
 package com.newcoder.community.controller;
 
+import com.newcoder.community.annotation.LoginRequired;
 import com.newcoder.community.entity.User;
 import com.newcoder.community.service.UserService;
 import com.newcoder.community.utils.CommunityUtils;
@@ -44,6 +45,7 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @GetMapping("/setting")
     public String getSettingPage(){
         return "/site/setting";
@@ -59,6 +61,7 @@ public class UserController {
      * 就是存在 服务器上，因为localhost服务器就是本机，更好的方法是把图片存储在云服务器上，然后访问他，
      * 这是后续内容。
      */
+    @LoginRequired
     @PostMapping("/upload")
     public String uploadHeader(MultipartFile headerImage, Model model){
         if(headerImage == null){
