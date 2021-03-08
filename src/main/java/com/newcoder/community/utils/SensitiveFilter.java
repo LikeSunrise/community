@@ -43,9 +43,10 @@ public class SensitiveFilter {
         try (
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        ) {
+        ){
             String keyword;//记录每一行读取到的字符
-            while ((keyword = reader.readLine()) != null) {
+            while ((keyword = reader.readLine()) != null)
+            {
                 //将读取到的字符一一挂到前缀树上
                 this.addKeyword(keyword);//一次处理一行字符
             }
@@ -57,11 +58,14 @@ public class SensitiveFilter {
     //将敏感词挂到前缀树上,方法
     public void addKeyword(String keyword) {
 
-        //定义一个临时节点，它首先指向根节点。负责不断往下延伸前缀树，就相当于一个指针
+        /**
+         * 定义一个临时节点，它首先指向根节点。负责不断往下延伸前缀树，就相当于一个指针
+         * 注意：在实际字符方面，每次输入流中读取的下一行，而在树结构端，每次tmp都必须重新指向root
+         */
         TrieNode tmpNode = rootNode;
         for (int i = 0; i < keyword.length(); i++) {
             char c = keyword.charAt(i);//当前字符
-            TrieNode subNode = tmpNode.getSubNode(c);
+            TrieNode subNode = tmpNode.getSubNode(c);//查看当前这个字符是否有子节点
 
             //如果发现当前所查到的字符没有子节点，那么久初始化一个节点挂到当前节点的下面
             if (subNode == null) {
@@ -85,8 +89,8 @@ public class SensitiveFilter {
         private boolean isKeywordEnd = false;
 
         /**
-         * 当前节点的子节点，Character 就是当前节点的子节点的字符值，
-         * 这个子节点的数据结构类型是TrieNode,这里为啥要定义一个value值为说明他是什么类型呢？
+         * 当前节点的子节点。key为Character ，就是当前节点的子节点的字符值，
+         * value是对应的树机构中的节点,这里为啥要定义一个value值为说明他是什么类型呢？
          * 因为我们要用到一个初始化的指针tmpNode，不断更新tmpNode，这个value就是为了赋值
          * tmpNode的，tmpNode不可能赋值为 当前字符吧 ！！
          */
@@ -129,7 +133,7 @@ public class SensitiveFilter {
         while (position < text.length()) {
             char c = text.charAt(position);
 
-            //跳过特殊符号
+            //跳过特殊符号（如果是特殊符号，特殊符号是不算敏感词的，所以应该加到sb尾）
             if (isSpecialSymbol(c)) {
                 if (tmpNode == rootNode) {
                     sb.append(c);
@@ -142,15 +146,20 @@ public class SensitiveFilter {
 
             //检查下一级节点
             tmpNode = tmpNode.getSubNode(c);
-            if (tmpNode == null)
+            if (tmpNode == null) //如果当前字符对应树结构中的节点的子节点是空的，说明他不是敏感词的开头
             {
                 sb.append(text.charAt(begin));
                 position = ++begin;
                 tmpNode = rootNode;
             }
-            else if(tmpNode.isKeywordEnd)
+            else if(tmpNode.isKeywordEnd)//如果当前字符对应树结构中的节点的子节点被标记为敏感词末尾true，则说明这一段都是敏感词
             {
                 sb.append(REPLACEMENT);
+                /**
+                 * 如果发现敏感词，那一定是position++，为什么呢
+                 * 比如“TSB”SB是敏感词，是begin指向s，position指向B，position下一个就目前来说一定不是敏感词
+                 * 当然也有可能是，这是下一轮判断的情况，所以，position先跳，begin再更新到position的一样的位置
+                 */
                 begin = ++position;
                 tmpNode = rootNode;
             }

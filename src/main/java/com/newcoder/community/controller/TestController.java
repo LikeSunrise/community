@@ -4,6 +4,7 @@ import com.newcoder.community.utils.CommunityUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
@@ -21,7 +22,7 @@ public class TestController {
     //例如，浏览器给出请求 http://localhost:8080/community/cookie/set，就会执行下列
     @GetMapping("/cookie/set")
     @ResponseBody
-    public String setCookie(HttpServletResponse response){
+    public String setCookie(HttpServletResponse response) {
 
         //创建 cookie
         Cookie cookie = new Cookie("code", CommunityUtils.generateUUID());
@@ -45,8 +46,8 @@ public class TestController {
 
     @GetMapping("/cookie/get")
     @ResponseBody
-    public String getCookie(@CookieValue("code") String code){
-        System.out.println("code =  "+ code );
+    public String getCookie(@CookieValue("code") String code) {
+        System.out.println("code =  " + code);
         return "get cookie successfully";
     }
 
@@ -58,18 +59,29 @@ public class TestController {
 
     @GetMapping("/session/set")
     @ResponseBody
-    public String setSession(HttpSession session){
-        session.setAttribute("id","123456");
-        session.setAttribute("name","吴瑞文");
+    public String setSession(HttpSession session) {
+        session.setAttribute("id", "123456");
+        session.setAttribute("name", "吴瑞文");
         return "set session successfully";
     }
 
     @GetMapping("/session/get")
     @ResponseBody
-    public String getSession(HttpSession session){
+    public String getSession(HttpSession session) {
         System.out.println(session.getAttribute("id"));
         System.out.println(session.getAttribute("name"));
 
         return "get session successfully";
+    }
+
+
+    //测试ajax发送请求
+    @PostMapping("/ajax")
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println("name = " + name);
+        System.out.println("age = " + age);
+
+        return CommunityUtils.getJSONString(0,"操作完美成功！");
     }
 }

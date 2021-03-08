@@ -1,11 +1,31 @@
-$(function(){
+$(function(){	//页面加载完毕就执行以下内容
 	$("#publishBtn").click(publish);
 });
 
 function publish() {
 	$("#publishModal").modal("hide");
-	$("#hintModal").modal("show");
-	setTimeout(function(){
-		$("#hintModal").modal("hide");
-	}, 2000);
+
+	var title = $("#recipient-name").val();
+	var content = $("#message-text").val();
+
+	$.post(
+		CONTEXT_PATH + "/discuss/add",
+		{"title":title,"content":content},
+		function (data) {
+			data = $.parseJSON(data);
+			// 提示框中显示返回消息
+			$("#hintBody").text(data.msg);
+			//显示提示框
+			$("#hintModal").modal("show");
+			// 2秒后自动隐藏提示框
+			setTimeout(function(){
+				$("#hintModal").modal("hide");
+				//如果数据添加成功，刷新页面
+				if(data.code ==0 ){
+					window.location.reload();
+				}
+			}, 2000);
+		}
+	);
+
 }

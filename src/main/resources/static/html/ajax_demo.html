@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax</title>
+</head>
+<body>
+
+    <p>
+        <input type="button" value="发送" onclick="send();">
+    </p>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script>
+        function send(){
+            $.post(                              //ajax发送post请求
+                "/community/ajax",               //第1个参数，请求的地址
+                {"name":"马化腾","age":36},        //第2个参数，向服务器提交的数据
+                    function (data) {           //回调函数，服务器向浏览器作反应时，浏览器收到后悔调用该方法，会把响应的内容传给这个data
+                        console.log(typeof(data));
+                        console.log(data);
+
+                        data = $.parseJSON(data);
+                        console.log(typeof(data));
+                        console.log(data);
+                        console.log(data.code);
+                        console.log(data.msg);
+                    }
+            );
+        }
+    </script>
+</body>
+</html>

@@ -1,10 +1,7 @@
 package com.newcoder.community.dao;
 
 import com.newcoder.community.entity.DiscussPost;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -17,6 +14,13 @@ public interface DiscussPostMapper {
     @SelectProvider(type = DiscussPostDaoProvider.class,method = "selectDiscussPostRows")
     int selectDiscussPostRows(@Param("userId") int userId);
 
+    @Insert("insert into discuss_post(id,user_id,title,content,type,status,create_time,comment_count,score) values(#{id},#{userId},#{title},#{content},#{type},#{status},#{createTime},#{commentCount},#{score})")
+    @Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
+    int insertDiscussPost(DiscussPost discussPost);
+
+
+    @Select("select id,user_id,title,content,type,status,create_time,comment_count,score from discuss_post where id = #{id}")
+    DiscussPost selectDiscussPostById(int id);
 
 //    自定义动态sql
     class DiscussPostDaoProvider{
