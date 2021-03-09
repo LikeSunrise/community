@@ -31,4 +31,16 @@ public interface CommunityConstant {
      * “记住我”状态下的，登录凭证过期时间
      */
     int REMEMBER_EXPIRED_SECONDS = 3600 * 24 * 100;
+
+
+    /**
+     *试题类型：帖子
+     */
+    int ENTITY_TYPE_POST = 1;
+
+
+    /**
+     *实体类型：评论
+     */
+    int ENTITY_TYPE_COMMENT = 2;
 }
